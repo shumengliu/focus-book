@@ -21,7 +21,9 @@ interface SiteDao {
     @Query("SELECT * FROM Sites")
     fun getSites(): LiveData<List<Site>>
 
+    @Query("SELECT url FROM Sites")
+    suspend fun getBlockList(): List<String>
+
     @Query("SELECT count(*) FROM Sites")
     suspend fun getCount(): Int
-
 }

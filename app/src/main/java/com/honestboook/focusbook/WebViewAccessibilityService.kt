@@ -1,23 +1,28 @@
 package com.honestboook.focusbook
 
 import android.accessibilityservice.AccessibilityService
-import android.content.Context
 import android.content.Intent
-import android.graphics.PixelFormat
 import android.net.Uri
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import androidx.recyclerview.widget.RecyclerView
-import com.honestboook.focusbook.databinding.ActivityBlockBinding
-import com.honestboook.focusbook.databinding.FragmentListBinding
+import com.honestboook.focusbook.data.SiteDao
+import com.honestboook.focusbook.data.SiteDatabase
+import com.honestboook.focusbook.repository.SiteRepository
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class WebViewAccessibilityService : AccessibilityService() {
     private val TAG: String = "WebViewAccessibilityService"
     private var prevApp: String = ""
     private var prevUrl: String = ""
+//    private val siteDao: SiteDao = SiteDatabase.getDatabase(this).siteDao()
+    private val siteRepository: SiteRepository
+
+    init {
+        val siteDao = SiteDatabase.getDatabase(this).siteDao()
+        siteRepository = SiteRepository(siteDao)
+    }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         when (event?.eventType) {
@@ -67,12 +72,14 @@ class WebViewAccessibilityService : AccessibilityService() {
         if (packageName != prevApp || capturedUrl != prevUrl) {
             if (android.util.Patterns.WEB_URL.matcher(capturedUrl).matches()) {
                 Log.d("history", "URL is $capturedUrl")
+                if (shouldBeBlocked(capturedUrl))
                 redirectToBlankPage()
 //                startBlockActivity()
             }
             prevUrl = capturedUrl
         }
     }
+
 
 
     private fun getBrowserConfig(packageName: String): SupportedBrowserConfig? {
@@ -100,6 +107,24 @@ class WebViewAccessibilityService : AccessibilityService() {
         }
     }
 
+    private fun shouldBeBlocked(capturedUrl: String): Boolean {
+        var flag: Boolean = false
+        runBlocking {
+            launch {
+                for (prohibited in getBlockList()) {
+                    if (capturedUrl.contains(prohibited, ignoreCase = true)) {
+                        flag = true
+                    }
+                }
+            }
+        }
+        return flag
+    }
+
+    private suspend fun getBlockList(): List<String> {
+        return siteRepository.getBlockList()
+    }
+
     private fun redirectToBlankPage() {
         Log.d(TAG, "redirecting to blank page")
         val blankPage: Uri = Uri.parse("about:blank")
@@ -108,11 +133,11 @@ class WebViewAccessibilityService : AccessibilityService() {
         applicationContext.startActivity(intent)
     }
 
-    private fun startBlockActivity() {
-        val intent = Intent(baseContext, BlockActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        applicationContext.startActivity(intent)
-    }
+//    private fun startBlockActivity() {
+//        val intent = Intent(baseContext, BlockActivity::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//        applicationContext.startActivity(intent)
+//    }
 
     override fun onInterrupt() {
     }

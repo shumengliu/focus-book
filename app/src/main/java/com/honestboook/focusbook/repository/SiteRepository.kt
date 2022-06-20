@@ -33,4 +33,8 @@ class SiteRepository(private val siteDao: SiteDao) {
     suspend fun deleteAllSites() {
         siteDao.deleteAllSites()
     }
+
+    suspend fun getBlockList():List<String> {
+        return siteDao.getBlockList()
+    }
 }
