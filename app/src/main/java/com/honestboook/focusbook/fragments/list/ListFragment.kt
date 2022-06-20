@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ import com.honestboook.focusbook.databinding.FragmentListBinding
 
 
 class ListFragment : Fragment() {
+    private val packageName = "com.honestboook.focusbook"
     private var _binding: FragmentListBinding? = null
 
     // This property is only valid between on CreateView and onDestroyView
@@ -37,19 +39,13 @@ class ListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         // SiteViewModel
-        siteViewModel = ViewModelProvider(this).get(SiteViewModel::class.java)
+        siteViewModel = ViewModelProvider(this)[SiteViewModel::class.java]
         siteViewModel.allSites.observe(viewLifecycleOwner, Observer { sites ->
             adapter.setData(sites)
         })
 
         binding.addFloatingBtn.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_addFragment)
-        }
-
-        binding.browseFloatingButton.setOnClickListener {
-            val webpage: Uri = Uri.parse("https://www.baidu.com")
-            val intent = Intent(Intent.ACTION_VIEW, webpage)
-            startActivity(intent)
         }
 
         setHasOptionsMenu(true)
@@ -67,10 +63,22 @@ class ListFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_delete) {
-            deleteAllSites()
+        when (item.itemId) {
+            R.id.menu_delete -> deleteAllSites()
+            R.id.menu_accessibility -> openAccessibilitySetting()
+            R.id.menu_overlay -> openOverlaySetting()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun openAccessibilitySetting() {
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        startActivity(intent)
+    }
+
+    private fun openOverlaySetting() {
+        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+        startActivity(intent)
     }
 
     private fun deleteAllSites() {
