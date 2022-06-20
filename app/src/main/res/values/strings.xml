@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Focus Book</string>
+    <string name="hint">hint</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="accessibility_service_description">Accessibility service for blocking websites</string>
+</resources>
