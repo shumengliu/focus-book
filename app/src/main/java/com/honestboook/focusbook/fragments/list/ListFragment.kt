@@ -1,10 +1,13 @@
 package com.honestboook.focusbook.fragments.list
 
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -15,9 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.honestboook.focusbook.R
 import com.honestboook.focusbook.SiteViewModel
 import com.honestboook.focusbook.databinding.FragmentListBinding
+import android.view.accessibility.AccessibilityManager
+import com.honestboook.focusbook.WebViewAccessibilityService
 
 
 class ListFragment : Fragment() {
+    private val TAG = "ListFragment"
     private val packageName = "com.honestboook.focusbook"
     private var _binding: FragmentListBinding? = null
 
@@ -40,9 +46,9 @@ class ListFragment : Fragment() {
 
         // SiteViewModel
         siteViewModel = ViewModelProvider(this)[SiteViewModel::class.java]
-        siteViewModel.allSites.observe(viewLifecycleOwner, Observer { sites ->
+        siteViewModel.allSites.observe(viewLifecycleOwner) { sites ->
             adapter.setData(sites)
-        })
+        }
 
         binding.addFloatingBtn.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_addFragment)
@@ -53,15 +59,47 @@ class ListFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        requireActivity().invalidateOptionsMenu()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+
+    // Methods related to create the menu
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.delete_menu, menu)
+        if (hasAccessibilityOn()) {
+            val item = menu.findItem(R.id.menu_accessibility)
+            item.isVisible = false
+        }
+        if (hasOverlayOn()) {
+            val item = menu.findItem(R.id.menu_overlay)
+            item.isVisible = false
+        }
     }
 
+    private fun hasAccessibilityOn(): Boolean {
+        val am = activity?.applicationContext?.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN)
+        Log.d(TAG, "${enabledServices.size} services are enabled")
+        for (service in enabledServices) {
+            if (service.settingsActivityName == WebViewAccessibilityService::class.java.canonicalName) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun hasOverlayOn(): Boolean {
+        return Settings.canDrawOverlays(activity?.applicationContext)
+    }
+
+    // Methods related to what the menu items do
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_delete -> deleteAllSites()

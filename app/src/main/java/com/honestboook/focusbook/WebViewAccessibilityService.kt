@@ -108,7 +108,7 @@ class WebViewAccessibilityService : AccessibilityService() {
     }
 
     private fun shouldBeBlocked(capturedUrl: String): Boolean {
-        var flag: Boolean = false
+        var flag = false
         runBlocking {
             launch {
                 for (prohibited in getBlockList()) {
@@ -132,12 +132,6 @@ class WebViewAccessibilityService : AccessibilityService() {
         intent.flags= Intent.FLAG_ACTIVITY_NEW_TASK
         applicationContext.startActivity(intent)
     }
-
-//    private fun startBlockActivity() {
-//        val intent = Intent(baseContext, BlockActivity::class.java)
-//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//        applicationContext.startActivity(intent)
-//    }
 
     override fun onInterrupt() {
     }

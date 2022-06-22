@@ -15,11 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FocusBook"
         tools:targetApi="31">
-        <service
-            android:name=".BlockService"
-            android:enabled="true"
-            android:exported="true"></service>
-
         <activity
             android:name=".BlockActivity"
             android:exported="false" />
