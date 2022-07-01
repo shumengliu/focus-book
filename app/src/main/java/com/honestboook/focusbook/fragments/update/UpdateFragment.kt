@@ -31,7 +31,6 @@ class UpdateFragment : Fragment() {
 
         siteViewModel = ViewModelProvider(this).get(SiteViewModel::class.java)
 
-        binding.updateSiteName.setText(args.currentSite.name)
         binding.updateSiteUrl.setText(args.currentSite.url)
 
         binding.updateBtn.setOnClickListener {
@@ -45,13 +44,12 @@ class UpdateFragment : Fragment() {
     }
 
     private fun updateSite() {
-        val name = binding.updateSiteName.text.toString()
         val url = binding.updateSiteUrl.text.toString()
 
-        if (inputCheck(name, url)) {
+        if (inputCheck(url)) {
             // create new site
             // IMPORTANT: use id of current site
-            val updatedSite = Site(args.currentSite.id, R.drawable.globe, name, url)
+            val updatedSite = Site(args.currentSite.id, url)
             // update current site
             siteViewModel.updateSite(updatedSite)
             Toast.makeText(requireContext(), "Site update success", Toast.LENGTH_SHORT).show()
@@ -62,8 +60,8 @@ class UpdateFragment : Fragment() {
         }
     }
 
-    private fun inputCheck(name: String, url: String): Boolean {
-        return !TextUtils.isEmpty(name) && !TextUtils.isEmpty(url)
+    private fun inputCheck(url: String): Boolean {
+        return !TextUtils.isEmpty(url)
     }
 
     override fun onDestroyView() {
@@ -86,12 +84,12 @@ class UpdateFragment : Fragment() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setPositiveButton("Yes") { _, _ ->
             siteViewModel.deleteSite(args.currentSite)
-            Toast.makeText(requireContext(), "Successfully removed ${args.currentSite.name}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Successfully removed ${args.currentSite.url}", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_updateFragment_to_listFragment)
         }
         builder.setNegativeButton("No") { _, _ -> }
-        builder.setTitle("Delete ${args.currentSite.name}")
-        builder.setMessage("Are you sure you want to remove ${args.currentSite.name} from the blocked sites?")
+        builder.setTitle("Delete ${args.currentSite.url}")
+        builder.setMessage("Are you sure you want to remove ${args.currentSite.url} from the blocked sites?")
         builder.create().show()
     }
 }

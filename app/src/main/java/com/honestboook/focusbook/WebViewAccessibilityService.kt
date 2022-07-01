@@ -17,12 +17,7 @@ class WebViewAccessibilityService : AccessibilityService() {
     private var prevApp: String = ""
     private var prevUrl: String = ""
 //    private val siteDao: SiteDao = SiteDatabase.getDatabase(this).siteDao()
-    private val siteRepository: SiteRepository
-
-    init {
-        val siteDao = SiteDatabase.getDatabase(this).siteDao()
-        siteRepository = SiteRepository(siteDao)
-    }
+    private lateinit var siteRepository: SiteRepository
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         when (event?.eventType) {
@@ -39,7 +34,7 @@ class WebViewAccessibilityService : AccessibilityService() {
                 resolveWindowContentChangeEvent(event)
             }
             else -> {
-                Log.d(TAG, "Event with unexpected type detected")
+//                Log.d(TAG, "Event with unexpected type detected")
             }
         }
     }
@@ -51,7 +46,6 @@ class WebViewAccessibilityService : AccessibilityService() {
         val parentNodeInfo: AccessibilityNodeInfo = event.source ?: return
 
         val packageName: String = event.packageName.toString()
-        Log.d(TAG, "package name is $packageName")
         prevApp = packageName
 
         // Check if the user is using a browser
@@ -65,16 +59,13 @@ class WebViewAccessibilityService : AccessibilityService() {
             return
         }
 
-        Log.d(TAG, "URL is $capturedUrl")
-
         // check if the browser or url has changed since last time
         // to avoid repetitive logs
         if (packageName != prevApp || capturedUrl != prevUrl) {
             if (android.util.Patterns.WEB_URL.matcher(capturedUrl).matches()) {
-                Log.d("history", "URL is $capturedUrl")
+//                Log.d("history", "URL is $capturedUrl")
                 if (shouldBeBlocked(capturedUrl))
                 redirectToBlankPage()
-//                startBlockActivity()
             }
             prevUrl = capturedUrl
         }
@@ -102,7 +93,6 @@ class WebViewAccessibilityService : AccessibilityService() {
         return if (addressBarInfo.text != null) {
             addressBarInfo.text.toString()
         } else {
-            Log.d(TAG, "address bar info is empty")
             null
         }
     }
@@ -138,11 +128,11 @@ class WebViewAccessibilityService : AccessibilityService() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "onCreate function is called")
+        val siteDao = SiteDatabase.getDatabase(this).siteDao()
+        siteRepository = SiteRepository(siteDao)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(TAG, "onStartCommand function is called")
         return super.onStartCommand(intent, flags, startId)
     }
 

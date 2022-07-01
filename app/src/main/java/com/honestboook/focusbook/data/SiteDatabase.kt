@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.honestboook.focusbook.model.Site
 
-@Database(entities = [Site::class], version = 1)
+@Database(entities = [Site::class], version = 2)
 abstract class SiteDatabase : RoomDatabase() {
 
     abstract fun siteDao(): SiteDao
@@ -22,7 +22,7 @@ abstract class SiteDatabase : RoomDatabase() {
                         context,
                         SiteDatabase::class.java,
                         "focus-book.db"
-                    ).build()
+                    ).fallbackToDestructiveMigration().build()
                 }
             }
             return INSTANCE!!

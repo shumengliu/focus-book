@@ -12,8 +12,6 @@ import kotlinx.parcelize.Parcelize
 data class Site(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val image: Int,
-    val name: String,
     val url: String
 ): Parcelable {
 }

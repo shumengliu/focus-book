@@ -39,13 +39,12 @@ class AddFragment : Fragment() {
     }
 
     private fun insertDataToDataBase() {
-        val name = binding.siteName.text.toString()
         val url = binding.siteUrl.text.toString()
 
-        if (inputCheck(name, url)) {
-            val site = Site(0, R.drawable.globe, name, url)
+        if (inputCheck(url)) {
+            val site = Site(0, url)
             siteViewModel.addSite(site)
-            Toast.makeText(requireContext(), "Succesfully added site!", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Successfully added site!", Toast.LENGTH_LONG).show()
 
             // navigate back
             findNavController().navigate(R.id.action_addFragment_to_listFragment)
@@ -54,8 +53,8 @@ class AddFragment : Fragment() {
         }
     }
 
-    private fun inputCheck(name: String, url: String): Boolean {
-        return !TextUtils.isEmpty(name) && !TextUtils.isEmpty(url)
+    private fun inputCheck(url: String): Boolean {
+        return !TextUtils.isEmpty(url)
     }
 
     override fun onDestroyView() {

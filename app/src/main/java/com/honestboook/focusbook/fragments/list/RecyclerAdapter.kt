@@ -20,8 +20,6 @@ class RecyclerAdapter() :
     class ViewHolder(private val binding: CardLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(site: Site) {
-            binding.itemImage.setImageResource(site.image)
-            binding.itemTitle.text = site.name
             binding.itemDetail.text = site.url
             binding.cardView.setOnClickListener {
                 val action = ListFragmentDirections.actionListFragmentToUpdateFragment(site)
@@ -30,33 +28,10 @@ class RecyclerAdapter() :
         }
     }
 
-//    inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-//        var itemImage: ImageView
-//        var itemTitle: TextView
-//        var itemDetail: TextView
-//        var cardView: CardView
-//
-//        init {
-//            itemImage = itemView.findViewById(R.id.itemImage)
-//            itemTitle = itemView.findViewById(R.id.itemTitle)
-//            itemDetail = itemView.findViewById(R.id.itemDetail)
-//            cardView = itemView.findViewById(R.id.cardView)
-//        }
-//    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = CardLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
-
-//    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        val curItem = siteList[position]
-//
-//        holder.itemImage.setImageResource(curItem.image)
-//        holder.itemTitle.text = curItem.name
-//        holder.itemDetail.text = curItem.url
-//
-//    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val curSite = siteList[position]
